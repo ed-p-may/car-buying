@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Car Purchase Checklist</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f2ec;
+    --surface: #ffffff;
+    --surface2: #f0ede6;
+    --border: #ddd9d0;
+    --text: #1a1815;
+    --text-muted: #7a7570;
+    --accent: #2d5a3d;
+    --accent-light: #e8f0eb;
+    --accent2: #8b4513;
+    --done-bg: #f0f0f0;
+    --done-text: #999;
+    --tag-bg: #fff8e8;
+    --tag-border: #e8d5a0;
+    --tag-text: #7a5c00;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0 0 80px;
+  }
+
+  header {
+    background: var(--accent);
+    color: white;
+    padding: 32px 32px 28px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  }
+
+  header h1 {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-bottom: 6px;
+  }
+
+  header h2 {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .progress-bar-wrap {
+    margin-top: 16px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 4px;
+    height: 6px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: #a8d5b5;
+    border-radius: 4px;
+    transition: width 0.4s ease;
+  }
+
+  .progress-label {
+    margin-top: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    opacity: 0.75;
+    letter-spacing: 0.06em;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px 0;
+  }
+
+  .phase {
+    margin-bottom: 28px;
+    background: var(--surface);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .phase-header {
+    padding: 18px 22px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    user-select: none;
+    transition: background 0.15s;
+  }
+
+  .phase-header:hover { background: var(--surface2); }
+
+  .phase-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: white;
+    background: var(--accent);
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.06em;
+    flex-shrink: 0;
+  }
+
+  .phase-num.complete { background: #6aaa80; }
+
+  .phase-title {
+    font-size: 15px;
+    font-weight: 600;
+    flex: 1;
+    letter-spacing: -0.01em;
+  }
+
+  .phase-subtitle {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 400;
+    display: block;
+    margin-top: 2px;
+  }
+
+  .phase-progress {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  .phase-progress.done { color: #6aaa80; font-weight: 500; }
+
+  .phase-toggle {
+    color: var(--text-muted);
+    font-size: 16px;
+    flex-shrink: 0;
+    transition: transform 0.2s;
+  }
+
+  .phase-body {
+    padding: 0;
+  }
+
+  .phase-body.collapsed { display: none; }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 14px 22px 6px;
+    border-top: 1px solid var(--border);
+  }
+
+  .section-label:first-child { border-top: none; }
+
+  .note-block {
+    margin: 4px 22px 10px;
+    background: var(--tag-bg);
+    border: 1px solid var(--tag-border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 12.5px;
+    color: var(--tag-text);
+    line-height: 1.5;
+  }
+
+  .note-block a {
+    color: var(--accent2);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .checklist-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 11px 22px;
+    border-top: 1px solid var(--border);
+    transition: background 0.15s;
+    cursor: pointer;
+  }
+
+  .checklist-item:first-of-type { border-top: none; }
+  .checklist-item:hover { background: var(--surface2); }
+
+  .checklist-item.checked {
+    background: var(--done-bg);
+  }
+
+  .checklist-item.checked .item-text {
+    color: var(--done-text);
+    text-decoration: line-through;
+    text-decoration-color: #bbb;
+  }
+
+  .checklist-item.checked .item-link {
+    opacity: 0.4;
+  }
+
+  .checkbox {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    background: white;
+  }
+
+  .checklist-item.checked .checkbox {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .checkbox-tick {
+    display: none;
+    color: white;
+    font-size: 11px;
+    line-height: 1;
+  }
+
+  .checklist-item.checked .checkbox-tick { display: block; }
+
+  .item-content { flex: 1; }
+
+  .item-text {
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--text);
+    transition: color 0.15s;
+  }
+
+  .item-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 4px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10.5px;
+    color: var(--accent2);
+    text-decoration: none;
+    border: 1px solid var(--tag-border);
+    background: var(--tag-bg);
+    padding: 2px 8px;
+    border-radius: 3px;
+    transition: opacity 0.15s;
+  }
+
+  .item-link:hover { opacity: 0.75; }
+
+  .doc-table {
+    margin: 0 22px 20px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 12.5px;
+  }
+
+  .doc-row {
+    display: grid;
+    grid-template-columns: 2fr 1.2fr 1.4fr;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .doc-row:last-child { border-bottom: none; }
+
+  .doc-row.header {
+    background: var(--surface2);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .doc-cell {
+    padding: 9px 12px;
+    border-right: 1px solid var(--border);
+    line-height: 1.4;
+  }
+
+  .doc-cell:last-child { border-right: none; }
+
+  .doc-cell a {
+    color: var(--accent2);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    font-size: 11px;
+    display: block;
+    margin-top: 3px;
+  }
+
+  .costs-block {
+    margin: 4px 22px 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+  }
+
+  .cost-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+
+  .cost-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+
+  .cost-amount {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+
+  .cost-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .reset-btn {
+    display: block;
+    margin: 28px auto 0;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 8px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .reset-btn:hover {
+    border-color: var(--accent2);
+    color: var(--accent2);
+  }
+
+  .timeline-block {
+    margin: 4px 22px 20px;
+    border-left: 2px solid var(--border);
+    padding-left: 16px;
+  }
+
+  .timeline-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 10px;
+    font-size: 12.5px;
+    line-height: 1.4;
+  }
+
+  .timeline-day {
+    font-family: 'DM Mono', monospace;
+    font-size: 10.5px;
+    color: var(--accent);
+    font-weight: 500;
+    flex-shrink: 0;
+    width: 52px;
+    padding-top: 1px;
+  }
+
+  .sync-status {
+    margin-top: 6px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    opacity: 0.7;
+  }
+
+  .sync-status.ok   { opacity: 0.6; }
+  .sync-status.err  { opacity: 1; color: #ffb3a7; }
+
+  .config-banner {
+    background: #fff3cd;
+    border: 1px solid #e8c84a;
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin-bottom: 24px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #5a4500;
+  }
+  .config-banner code {
+    font-family: 'DM Mono', monospace;
+    background: rgba(0,0,0,0.07);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 11.5px;
+  }
+  .config-banner strong { font-weight: 600; }
+
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Ed's Checklist</h1>
+  <h2>Subaru Purchase · NYC → Berkshires</h2>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+  </div>
+  <div class="progress-label" id="progressLabel">0 of 0 items complete</div>
+  <div id="syncStatus" class="sync-status">⏳ connecting...</div>
+</header>
+
+<div class="container">
+
+  <!-- CONFIG BANNER — hidden once Supabase is wired up -->
+  <div class="config-banner" id="configBanner">
+    <strong>⚙️ One-time setup required</strong> — paste your Supabase credentials into the two constants at the top of the <code>&lt;script&gt;</code> block in this file:<br><br>
+    <code>SUPABASE_URL</code> — your project URL, e.g. <code>https://xxxx.supabase.co</code><br>
+    <code>SUPABASE_ANON_KEY</code> — your project's <code>anon</code> / public API key<br><br>
+    Also run this SQL once in your Supabase SQL editor:<br>
+    <code>create table checklist_state (item_id text primary key, checked boolean default false, updated_at timestamptz default now());</code><br><br>
+    Once credentials are set, this banner disappears automatically.
+  </div>
+
+  <!-- PHASE 1 -->
+  <div class="phase" id="phase-1">
+    <div class="phase-header" onclick="togglePhase('phase-1')">
+      <span class="phase-num" id="phase-1-num">01</span>
+      <div>
+        <div class="phase-title">Preparation</div>
+        <span class="phase-subtitle">Do this week, before anything moves</span>
+      </div>
+      <span class="phase-progress" id="phase-1-prog"></span>
+      <span class="phase-toggle" id="phase-1-toggle">▾</span>
+    </div>
+    <div class="phase-body" id="phase-1-body">
+
+      <div class="section-label">Financing — TD Fit Loan</div>
+      <div class="checklist-item" data-item-id="item-01-complete-td-fit-loan-application-formal-apply-this" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Complete TD Fit Loan application (formal apply — this triggers the hard credit pull)</div>
+          <a class="item-link" href="https://www.tdfitloan.com/" target="_blank">↗ tdfitloan.com</a>
+        </div>
+      </div>
+      <div class="checklist-item" data-item-id="item-02-confirm-8-000-loan-amount-60-month-term-9-rate" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Confirm: $8,000 loan amount · 60-month term · ~9% rate</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-item-id="item-03-confirm-disbursement-method-td-deposits-to-your-ch" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Confirm disbursement method — TD deposits to your checking account or issues a cashier's check</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-item-id="item-04-set-up-autopay-for-loan-payments" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Set up autopay for loan payments</div>
+        </div>
+      </div>
+
+      <div class="section-label">Confirm the Title is Clean</div>
+      <div class="checklist-item" data-item-id="item-05-ask-john-to-confirm-seller-s-name-on-title-matches" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Ask John to confirm: seller's name on title matches her ID exactly</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-item-id="item-06-confirm-no-lienholder-listed-on-the-front-of-the-t" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Confirm: NO lienholder listed on the front of the title (no existing loan on car)</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-item-id="item-07-confirm-john-has-original-power-of-attorney-docume" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Confirm John has original Power of Attorney document — he'll need it at signing and at the RMV</div>
+        </div>
+      </div>
+
+      <div class="section-label">Insurance — Get Quotes Now</div>
+      <div class="note-block">
+        Get the VIN from John now. Quote MA insurance but do NOT bind the policy yet — wait until the moment of title signing.
+      </div>
+      <div class="checklist-item" data-item-id="item-08-get-vin-from-john" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Get VIN from John</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-item-id="item-09-get-ma-insurance-quotes-using-vin-specify-berkshir" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Get MA insurance quotes using VIN — specify Berkshire County address</div>
+          <a class="item-link" href="https://www.geico.com/auto-insurance/" target="_blank">↗ GEICO</a>
+          <a class="item-link" href="https://www.progressive.com/auto/" target="_blank" style="margin-left:6px">↗ Progressive</a>
+          <a class="item-link" href="https://www.statefarm.com/insurance/auto" target="_blank" style="margin-left:6px">↗ State Farm</a>
+        </div>
+      </div>
+      <div class="checklist-item" data-item-id="item-10-confirm-your-chosen-insurer-has-a-licensed-ma-agen" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Confirm your chosen insurer has a licensed MA agent in Berkshire County (needed to stamp your RMV form)</div>
+        </div>
+      </div>
+
+      <div class="section-label">Prepare Documents in Advance</div>
+      <div class="checklist-item" data-item-id="item-11-download-and-pre-fill-ny-bill-of-sale-form-mv-912" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Download and pre-fill NY Bill of Sale Form MV-912 — leave date and signatures blank</div>
+          <a class="item-link" href="https://dmv.ny.gov/forms/mv912.pdf" target="_blank">↗ NY DMV Form MV-912</a>
+        </div>
+      </div>
+      <div class="checklist-item" data-item-id="item-12-download-ny-statement-of-transaction-form-dtf-802" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Download NY Statement of Transaction Form DTF-802 (sales tax form)</div>
+          <a class="item-link" href="https://www.tax.ny.gov/pdf/current_forms/dtf/dtf802_fill_in.pdf" target="_blank">↗ NY Form DTF-802</a>
+        </div>
+      </div>
+      <div class="checklist-item" data-item-id="item-13-download-ma-application-for-registration-title-for" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Download MA Application for Registration & Title Form TTLREG100</div>
+          <a class="item-link" href="https://www.mass.gov/doc/application-for-registration-title-ttlreg100/download" target="_blank">↗ MA Form TTLREG100</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div class="phase" id="phase-2">
+    <div class="phase-header" onclick="togglePhase('phase-2')">
+      <span class="phase-num" id="phase-2-num">02</span>
+      <div>
+        <div class="phase-title">The Drive Up</div>
+        <span class="phase-subtitle">John drives to Berkshires under seller's plates — title NOT yet signed</span>
+      </div>
+      <span class="phase-progress" id="phase-2-prog"></span>
+      <span class="phase-toggle" id="phase-2-toggle">▾</span>
+    </div>
+    <div class="phase-body" id="phase-2-body">
+
+      <div class="note-block">
+        Maggie still legally owns the car during this trip. Her insurance covers the vehicle. John drives under her existing NY registration and plates. No title is signed yet.
+      </div>
+
+      <div class="section-label">Before the Drive — Confirm</div>
+      <div class="checklist-item" data-item-id="item-14-maggie-s-ny-registration-is-current-and-physically" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Maggie's NY registration is current and physically in the car</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-item-id="item-15-maggie-s-insurance-is-active-and-covers-permissive" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Maggie's insurance is active and covers permissive use (John driving her car)</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-item-id="item-16-john-has-the-original-title-with-him-for-signing-i" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">John has the original title with him for signing in MA</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-item-id="item-17-john-has-original-power-of-attorney-document-with" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">John has original Power of Attorney document with him</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-item-id="item-18-john-has-his-id-driver-s-license" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">John has his ID / driver's license</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-item-id="item-19-you-have-the-pre-filled-bill-of-sale-dtf-802-and-a" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">You have the pre-filled Bill of Sale, DTF-802, and a blue or black pen ready for signing</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-item-id="item-20-loan-funds-confirmed-in-your-td-account-or-cashier" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Loan funds confirmed in your TD account (or cashier's check in hand)</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PHASE 3 -->
+  <div class="phase" id="phase-3">
+    <div class="phase-header" onclick="togglePhase('phase-3')">
+      <span class="phase-num" id="phase-3-num">03</span>
+      <div>
+        <div class="phase-title">The Signing</div>
+        <span class="phase-subtitle">At your MA address — legal moment of sale</span>
+      </div>
+      <span class="phase-progress" id="phase-3-prog"></span>
+      <span class="phase-toggle" id="phase-3-toggle">▾</span>
+    </div>
+    <div class="phase-body" id="phase-3-body">
+
+      <div class="note-block">
+        ⚠️ Title errors are the #1 snag in private sales. Blue or black ink only. No white-out, no corrections. Take it slow.
+      </div>
+
+      <div class="section-label">Complete the Title (John signs as POA)</div>
+      <div class="checklist-item" data-item-id="item-21-john-completes-transfer-by-owner-section-on-the-ba" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">John completes "Transfer by Owner" section on the back of the NY title</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-item-id="item-22-title-back-includes-seller-name-address-your-name" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Title back includes: seller name/address · your name/address · date · odometer reading · damage disclosure</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-item-id="item-23-john-signs-as-maggie-s-full-name-by-john-s-full-na" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">John signs as: "[Maggie's full name], by [John's full name], Power of Attorney"</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-item-id="item-24-you-sign-the-buyer-section-of-the-title" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">You sign the buyer section of the title</div>
+        </div>
+      </div>
+
+      <div class="section-label">Complete the Supporting Documents</div>
+      <div class="checklist-item" data-item-id="item-25-both-parties-sign-bill-of-sale-mv-912-add-today-s" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Both parties sign Bill of Sale (MV-912) — add today's date and purchase price</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-item-id="item-26-both-parties-complete-and-sign-ny-statement-of-tra" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Both parties complete and sign NY Statement of Transaction (DTF-802)</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-item-id="item-27-hand-over-payment-cashier-s-check-or-confirm-td-fu" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Hand over payment (cashier's check or confirm TD funds transferred)</div>
+        </div>
+      </div>
+
+      <div class="section-label">Immediately After Signing</div>
+      <div class="checklist-item" data-item-id="item-28-call-app-your-insurer-and-bind-your-ma-insurance-p" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Call/app your insurer and BIND your MA insurance policy — you own the car now</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-item-id="item-29-john-removes-ny-plates-from-the-car" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">John removes NY plates from the car</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-item-id="item-30-john-takes-plates-back-to-nyc-maggie-must-surrende" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">John takes plates back to NYC — Maggie must surrender them to NY DMV</div>
+          <a class="item-link" href="https://dmv.ny.gov/registration/cancel-vehicle-registration" target="_blank">↗ NY DMV Plate Surrender</a>
+        </div>
+      </div>
+      <div class="checklist-item" data-item-id="item-31-john-catches-metro-north-back-to-nyc" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">John catches Metro North back to NYC ✓</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PHASE 4 -->
+  <div class="phase" id="phase-4">
+    <div class="phase-header" onclick="togglePhase('phase-4')">
+      <span class="phase-num" id="phase-4-num">04</span>
+      <div>
+        <div class="phase-title">MA Registration</div>
+        <span class="phase-subtitle">Must be done within 10 days of signing</span>
+      </div>
+      <span class="phase-progress" id="phase-4-prog"></span>
+      <span class="phase-toggle" id="phase-4-toggle">▾</span>
+    </div>
+    <div class="phase-body" id="phase-4-body">
+
+      <div class="note-block">
+        ⏱ MA law requires titling within 10 days of purchase. Don't delay. You cannot drive the car (no plates) until you have your MA registration.
+      </div>
+
+      <div class="section-label">Step 1 — Insurance Agent Stamp (Before RMV)</div>
+      <div class="note-block">
+        MA is unique: your insurance agent must physically stamp your registration form before you can register. This step has to happen before the RMV visit.
+      </div>
+      <div class="checklist-item" data-item-id="item-32-find-a-licensed-ma-insurance-agent-office-in-berks" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Find a licensed MA insurance agent office in Berkshire County</div>
+          <a class="item-link" href="https://www.mass.gov/service-details/find-a-licensed-insurance-agent-or-broker" target="_blank">↗ Find MA Licensed Agent</a>
+        </div>
+      </div>
+      <div class="checklist-item" data-item-id="item-33-bring-form-ttlreg100-to-the-agent-they-complete-st" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Bring Form TTLREG100 to the agent — they complete, stamp, and sign it</div>
+        </div>
+      </div>
+
+      <div class="section-label">Step 2 — RMV Service Center (In Person)</div>
+      <div class="checklist-item" data-item-id="item-34-find-pittsfield-rmv-location-and-confirm-hours-bef" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Find Pittsfield RMV location and confirm hours before going</div>
+          <a class="item-link" href="https://www.mass.gov/orv/find-a-dmv-service-center" target="_blank">↗ Find RMV Service Center</a>
+        </div>
+      </div>
+
+      <div class="section-label">Bring Everything to the RMV</div>
+      <div class="checklist-item" data-item-id="item-35-signed-ny-title-original-do-not-lose-this" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content"><div class="item-text">Signed NY title (original — do not lose this)</div></div>
+      </div>
+      <div class="checklist-item" data-item-id="item-36-bill-of-sale-form-mv-912-original" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content"><div class="item-text">Bill of Sale Form MV-912 (original)</div></div>
+      </div>
+      <div class="checklist-item" data-item-id="item-37-completed-agent-stamped-form-ttlreg100" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content"><div class="item-text">Completed + agent-stamped Form TTLREG100</div></div>
+      </div>
+      <div class="checklist-item" data-item-id="item-38-ma-insurance-id-card-from-your-insurer" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content"><div class="item-text">MA Insurance ID card (from your insurer)</div></div>
+      </div>
+      <div class="checklist-item" data-item-id="item-39-john-s-power-of-attorney-document-rmv-may-ask-titl" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content"><div class="item-text">John's Power of Attorney document (RMV may ask — title was signed by POA)</div></div>
+      </div>
+      <div class="checklist-item" data-item-id="item-40-your-ny-driver-s-license" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content"><div class="item-text">Your NY driver's license</div></div>
+      </div>
+      <div class="checklist-item" data-item-id="item-41-payment-635-see-cost-breakdown-below" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content"><div class="item-text">Payment (~$635 — see cost breakdown below)</div></div>
+      </div>
+
+      <div class="costs-block">
+        <div class="cost-item">
+          <div class="cost-label">Sales Tax</div>
+          <div class="cost-amount">$500.00</div>
+          <div class="cost-desc">6.25% × $8,000</div>
+        </div>
+        <div class="cost-item">
+          <div class="cost-label">Registration</div>
+          <div class="cost-amount">~$60</div>
+          <div class="cost-desc">2-year passenger plate</div>
+        </div>
+        <div class="cost-item">
+          <div class="cost-label">Title Fee</div>
+          <div class="cost-amount">$75</div>
+          <div class="cost-desc">MA title issuance</div>
+        </div>
+      </div>
+
+      <div class="section-label">Step 3 — Vehicle Inspection</div>
+      <div class="note-block">
+        Within 7 days of registration. Combined safety + emissions. ~$35. Any licensed MA garage or service station can do this.
+      </div>
+      <div class="checklist-item" data-item-id="item-42-get-ma-vehicle-inspection-within-7-days-of-registr" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Get MA vehicle inspection within 7 days of registration date</div>
+          <a class="item-link" href="https://www.mass.gov/how-to/get-a-vehicle-inspection" target="_blank">↗ MA Inspection Info</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PHASE 5 -->
+  <div class="phase" id="phase-5">
+    <div class="phase-header" onclick="togglePhase('phase-5')">
+      <span class="phase-num" id="phase-5-num">05</span>
+      <div>
+        <div class="phase-title">Loose Ends</div>
+        <span class="phase-subtitle">Within 30–60 days of moving to MA full time</span>
+      </div>
+      <span class="phase-progress" id="phase-5-prog"></span>
+      <span class="phase-toggle" id="phase-5-toggle">▾</span>
+    </div>
+    <div class="phase-body" id="phase-5-body">
+
+      <div class="checklist-item" data-item-id="item-43-get-your-ma-driver-s-license-required-once-you-re" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Get your MA driver's license (required once you're a full-time MA resident)</div>
+          <a class="item-link" href="https://www.mass.gov/how-to/get-a-massachusetts-drivers-license" target="_blank">↗ MA Driver's License</a>
+        </div>
+      </div>
+      <div class="checklist-item" data-item-id="item-44-confirm-td-loan-autopay-is-running-check-first-sta" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Confirm TD loan autopay is running — check first statement</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-item-id="item-45-confirm-maggie-s-ny-plates-have-been-surrendered-t" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Confirm Maggie's NY plates have been surrendered to NY DMV (protects her from future tickets)</div>
+          <a class="item-link" href="https://dmv.ny.gov/registration/cancel-vehicle-registration" target="_blank">↗ NY Plate Surrender</a>
+        </div>
+      </div>
+      <div class="checklist-item" data-item-id="item-46-file-td-loan-documents-and-ma-title-in-a-safe-plac" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">File TD loan documents and MA title in a safe place when it arrives by mail (~10 days after RMV)</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-item-id="item-47-note-annual-ma-vehicle-excise-tax-billed-by-your-t" onclick="toggle(this)">
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">Note annual MA vehicle excise tax — billed by your town, due within 30 days of bill date</div>
+          <a class="item-link" href="https://www.mass.gov/info-details/motor-vehicle-excise-tax" target="_blank">↗ MA Excise Tax Info</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- DOCUMENT TABLE -->
+  <div class="phase" id="phase-docs">
+    <div class="phase-header" onclick="togglePhase('phase-docs')">
+      <span class="phase-num" id="phase-docs-num" style="background:#555">DOC</span>
+      <div>
+        <div class="phase-title">Master Document Reference</div>
+        <span class="phase-subtitle">All forms at a glance</span>
+      </div>
+      <span class="phase-toggle" id="phase-docs-toggle">▾</span>
+    </div>
+    <div class="phase-body" id="phase-docs-body">
+      <div style="height:12px"></div>
+      <div class="doc-table">
+        <div class="doc-row header">
+          <div class="doc-cell">Document</div>
+          <div class="doc-cell">Who Prepares</div>
+          <div class="doc-cell">When Needed</div>
+        </div>
+        <div class="doc-row">
+          <div class="doc-cell">NY Title (original)<a href="https://dmv.ny.gov/titles/buy-sell-or-transfer-vehicle-ownership" target="_blank">↗ NY DMV Title Info</a></div>
+          <div class="doc-cell">Seller has it</div>
+          <div class="doc-cell">Phases 3 & 4</div>
+        </div>
+        <div class="doc-row">
+          <div class="doc-cell">Power of Attorney (original)<a href="https://dmv.ny.gov/forms/mv1001.pdf" target="_blank">↗ NY DMV POA form reference</a></div>
+          <div class="doc-cell">John has it</div>
+          <div class="doc-cell">Phases 3 & 4</div>
+        </div>
+        <div class="doc-row">
+          <div class="doc-cell">Bill of Sale — NY Form MV-912<a href="https://dmv.ny.gov/forms/mv912.pdf" target="_blank">↗ Download MV-912</a></div>
+          <div class="doc-cell">You pre-fill, both sign</div>
+          <div class="doc-cell">Phase 3</div>
+        </div>
+        <div class="doc-row">
+          <div class="doc-cell">Statement of Transaction — NY Form DTF-802<a href="https://www.tax.ny.gov/pdf/current_forms/dtf/dtf802_fill_in.pdf" target="_blank">↗ Download DTF-802</a></div>
+          <div class="doc-cell">Both complete at signing</div>
+          <div class="doc-cell">Phase 3</div>
+        </div>
+        <div class="doc-row">
+          <div class="doc-cell">MA Registration & Title App — TTLREG100<a href="https://www.mass.gov/doc/application-for-registration-title-ttlreg100/download" target="_blank">↗ Download TTLREG100</a></div>
+          <div class="doc-cell">You download, agent stamps</div>
+          <div class="doc-cell">Phase 4</div>
+        </div>
+        <div class="doc-row">
+          <div class="doc-cell">MA Insurance ID Card</div>
+          <div class="doc-cell">Your insurer issues</div>
+          <div class="doc-cell">Phase 4</div>
+        </div>
+        <div class="doc-row">
+          <div class="doc-cell">Your NY Driver's License</div>
+          <div class="doc-cell">You have it</div>
+          <div class="doc-cell">Phase 4</div>
+        </div>
+        <div class="doc-row">
+          <div class="doc-cell">TD Loan funds / cashier's check</div>
+          <div class="doc-cell">TD Bank</div>
+          <div class="doc-cell">Phase 3</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIMELINE -->
+  <div class="phase" id="phase-timeline">
+    <div class="phase-header" onclick="togglePhase('phase-timeline')">
+      <span class="phase-num" id="phase-timeline-num" style="background:#555">TIME</span>
+      <div>
+        <div class="phase-title">Timeline Summary</div>
+        <span class="phase-subtitle">From signing day to legally on the road</span>
+      </div>
+      <span class="phase-toggle" id="phase-timeline-toggle">▾</span>
+    </div>
+    <div class="phase-body" id="phase-timeline-body">
+      <div style="height:16px"></div>
+      <div class="timeline-block">
+        <div class="timeline-row"><div class="timeline-day">This week</div><div>Apply for TD Fit Loan · Get VIN · Get insurance quotes · Download and pre-fill forms</div></div>
+        <div class="timeline-row"><div class="timeline-day">Drive day</div><div>John drives car to Berkshires under seller's plates (title NOT signed yet)</div></div>
+        <div class="timeline-row"><div class="timeline-day">Signing day</div><div>John signs title over to you (as POA) · Both sign Bill of Sale + DTF-802 · Bind MA insurance · John removes plates and heads to Metro North</div></div>
+        <div class="timeline-row"><div class="timeline-day">Day 1–2</div><div>Go to MA insurance agent — get TTLREG100 stamped</div></div>
+        <div class="timeline-row"><div class="timeline-day">Day 1–10</div><div>Go to Pittsfield RMV in person — bring everything · Walk out with MA plates</div></div>
+        <div class="timeline-row"><div class="timeline-day">+7 days</div><div>Vehicle inspection at any licensed MA garage (~$35)</div></div>
+        <div class="timeline-row"><div class="timeline-day">~10 days</div><div>MA title arrives by mail</div></div>
+        <div class="timeline-row"><div class="timeline-day">30–60 days</div><div>Get MA driver's license · Confirm Maggie's NY plates have been surrendered to NY DMV</div></div>
+      </div>
+      <div style="height:8px"></div>
+    </div>
+  </div>
+
+  <button class="reset-btn" onclick="resetAll()">Reset all checkboxes</button>
+
+</div>
+
+<script>
+  // ─────────────────────────────────────────────
+  // SUPABASE CONFIG — paste your values here
+  // ─────────────────────────────────────────────
+  const SUPABASE_URL      = 'https://wvsasixktnwinuexjonm.supabase.co';   // e.g. 'https://abcdefgh.supabase.co'
+  const SUPABASE_ANON_KEY = 'sb_publishable_JyERSgd6lpI2na5X8nXqPQ_ezXmN5m-';   // your project's anon/public key
+  // ─────────────────────────────────────────────
+
+  const TABLE = 'checklist_state';
+  const POLL_INTERVAL_MS = 15000; // refresh from server every 15 seconds
+  const configured = SUPABASE_URL && SUPABASE_ANON_KEY;
+
+  // ── Supabase REST helpers ──────────────────────
+
+  async function sbFetch(method, path, body) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+      method,
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': method === 'POST' ? 'resolution=merge-duplicates' : ''
+      },
+      body: body ? JSON.stringify(body) : undefined
+    });
+    if (!res.ok) throw new Error(`${method} ${path} → ${res.status}`);
+    return method === 'GET' ? res.json() : res;
+  }
+
+  async function loadRemoteState() {
+    const rows = await sbFetch('GET', `${TABLE}?select=item_id,checked`);
+    const state = {};
+    rows.forEach(r => { state[r.item_id] = r.checked; });
+    return state;
+  }
+
+  async function saveRemoteItem(itemId, checked) {
+    await sbFetch('POST', TABLE, { item_id: itemId, checked, updated_at: new Date().toISOString() });
+  }
+
+  async function clearRemoteAll() {
+    await sbFetch('DELETE', `${TABLE}?item_id=neq.null`);
+  }
+
+  // ── LocalStorage fallback ──────────────────────
+
+  const LS_KEY = 'subaru-checklist-2026';
+
+  function loadLocalState() {
+    try { return JSON.parse(localStorage.getItem(LS_KEY)) || {}; } catch { return {}; }
+  }
+
+  function saveLocalState(state) {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch {}
+  }
+
+  // ── UI helpers ────────────────────────────────
+
+  function setSyncStatus(msg, cls) {
+    const el = document.getElementById('syncStatus');
+    if (!el) return;
+    el.textContent = msg;
+    el.className = 'sync-status' + (cls ? ' ' + cls : '');
+  }
+
+  function applyState(state) {
+    document.querySelectorAll('.checklist-item[data-item-id]').forEach(el => {
+      const id = el.dataset.itemId;
+      if (state[id]) el.classList.add('checked');
+      else el.classList.remove('checked');
+    });
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const items = document.querySelectorAll('.checklist-item');
+    const total = items.length;
+    const done  = document.querySelectorAll('.checklist-item.checked').length;
+    const pct   = total ? Math.round((done / total) * 100) : 0;
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressLabel').textContent = done + ' of ' + total + ' items complete';
+
+    ['phase-1','phase-2','phase-3','phase-4','phase-5'].forEach(id => {
+      const phase = document.getElementById(id);
+      if (!phase) return;
+      const pItems = phase.querySelectorAll('.checklist-item');
+      const pDone  = phase.querySelectorAll('.checklist-item.checked').length;
+      const prog   = document.getElementById(id + '-prog');
+      const num    = document.getElementById(id + '-num');
+      if (prog) {
+        if (!pItems.length) return;
+        prog.textContent  = pDone + '/' + pItems.length;
+        prog.className    = 'phase-progress' + (pDone === pItems.length ? ' done' : '');
+      }
+      if (num) {
+        if (pDone === pItems.length && pItems.length > 0) num.classList.add('complete');
+        else num.classList.remove('complete');
+      }
+    });
+  }
+
+  // ── Event handlers ────────────────────────────
+
+  function togglePhase(id) {
+    const body = document.getElementById(id + '-body');
+    const tog  = document.getElementById(id + '-toggle');
+    if (!body) return;
+    body.classList.toggle('collapsed');
+    tog.textContent = body.classList.contains('collapsed') ? '▸' : '▾';
+  }
+
+  async function toggle(el) {
+    const id      = el.dataset.itemId;
+    const checked = !el.classList.contains('checked');
+    el.classList.toggle('checked', checked);
+    updateProgress();
+
+    if (configured) {
+      setSyncStatus('⏳ saving...', '');
+      try {
+        await saveRemoteItem(id, checked);
+        setSyncStatus('✓ synced ' + timestamp(), 'ok');
+      } catch (e) {
+        setSyncStatus('⚠️ save failed — working offline', 'err');
+        console.error(e);
+        // persist locally as fallback
+        const state = loadLocalState();
+        state[id] = checked;
+        saveLocalState(state);
+      }
+    } else {
+      // offline mode — localStorage only
+      const state = loadLocalState();
+      state[id] = checked;
+      saveLocalState(state);
+    }
+  }
+
+  async function resetAll() {
+    if (!confirm('Reset all checkboxes for everyone?')) return;
+    document.querySelectorAll('.checklist-item').forEach(el => el.classList.remove('checked'));
+    updateProgress();
+    if (configured) {
+      setSyncStatus('⏳ clearing...', '');
+      try {
+        await clearRemoteAll();
+        setSyncStatus('✓ reset synced ' + timestamp(), 'ok');
+      } catch (e) {
+        setSyncStatus('⚠️ remote reset failed', 'err');
+      }
+    } else {
+      saveLocalState({});
+    }
+  }
+
+  // ── Polling ───────────────────────────────────
+
+  async function poll() {
+    if (!configured) return;
+    try {
+      const state = await loadRemoteState();
+      applyState(state);
+      setSyncStatus('✓ synced ' + timestamp(), 'ok');
+    } catch (e) {
+      setSyncStatus('⚠️ offline — last sync: ' + timestamp(), 'err');
+    }
+  }
+
+  function timestamp() {
+    return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  // ── Boot ──────────────────────────────────────
+
+  async function init() {
+    const banner = document.getElementById('configBanner');
+
+    if (!configured) {
+      // Fall back to localStorage, hide connection status
+      setSyncStatus('📴 offline mode — localStorage only', '');
+      const state = loadLocalState();
+      applyState(state);
+      if (banner) banner.style.display = 'block';
+      return;
+    }
+
+    // Hide setup banner — we're configured
+    if (banner) banner.style.display = 'none';
+    setSyncStatus('⏳ loading...', '');
+
+    try {
+      const state = await loadRemoteState();
+      applyState(state);
+      setSyncStatus('✓ synced ' + timestamp(), 'ok');
+      // Start polling for John's updates
+      setInterval(poll, POLL_INTERVAL_MS);
+    } catch (e) {
+      setSyncStatus('⚠️ could not reach Supabase — offline mode', 'err');
+      const state = loadLocalState();
+      applyState(state);
+    }
+  }
+
+  init();
+</script>
+</body>
+</html>
